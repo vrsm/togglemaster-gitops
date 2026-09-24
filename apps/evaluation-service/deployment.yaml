@@ -17,70 +17,83 @@ spec:
         app: evaluation-service
     spec:
       containers:
-      - name: evaluation-service
-        image: 523694734848.dkr.ecr.us-east-1.amazonaws.com/evaluation-service:latest
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 8004
-        env:
-        - name: PORT
-          value: "8004"
+        - name: evaluation-service
+          image: 523694734848.dkr.ecr.us-east-1.amazonaws.com/evaluation-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8004
 
-        - name: REDIS_URL
-          valueFrom:
-            configMapKeyRef:
-              name: togglemaster-config
-              key: REDIS_URL
+          env:
+            - name: PORT
+              value: "8004"
 
-        - name: AWS_REGION
-          valueFrom:
-            configMapKeyRef:
-              name: togglemaster-config
-              key: AWS_REGION
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: togglemaster-config
+                  key: REDIS_HOST
 
-        - name: AWS_SQS_URL
-          valueFrom:
-            configMapKeyRef:
-              name: togglemaster-config
-              key: AWS_SQS_URL
+            - name: REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: togglemaster-config
+                  key: REDIS_PORT
 
-        - name: FLAG_SERVICE_URL
-          valueFrom:
-            configMapKeyRef:
-              name: togglemaster-config
-              key: FLAG_SERVICE_URL
+            - name: REDIS_URL
+              value: "rediss://$(REDIS_HOST):$(REDIS_PORT)"
 
-        - name: TARGETING_SERVICE_URL
-          valueFrom:
-            configMapKeyRef:
-              name: togglemaster-config
-              key: TARGETING_SERVICE_URL
+            - name: AWS_REGION
+              valueFrom:
+                configMapKeyRef:
+                  name: togglemaster-config
+                  key: AWS_REGION
 
-        - name: SERVICE_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: togglemaster-service-api
-              key: SERVICE_API_KEY
+            - name: AWS_SQS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: togglemaster-config
+                  key: AWS_SQS_URL
 
-        resources:
-          requests:
-            cpu: "100m"
-            memory: "128Mi"
-          limits:
-            cpu: "500m"
-            memory: "512Mi"
-        readinessProbe:
-          httpGet:
-            path: /health
-            port: 8004
-          initialDelaySeconds: 10
-          periodSeconds: 5
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 8004
-          initialDelaySeconds: 30
-          periodSeconds: 10
+            - name: FLAG_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: togglemaster-config
+                  key: FLAG_SERVICE_URL
+
+            - name: TARGETING_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: togglemaster-config
+                  key: TARGETING_SERVICE_URL
+
+            - name: SERVICE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: togglemaster-service-api
+                  key: SERVICE_API_KEY
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8004
+            initialDelaySeconds: 10
+            periodSeconds: 5
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8004
+            initialDelaySeconds: 30
+            periodSeconds: 10
+
 ---
 apiVersion: v1
 kind: Service
@@ -92,8 +105,8 @@ spec:
   selector:
     app: evaluation-service
   ports:
-  - port: 8004
-    targetPort: 8004
+    - port: 8004
+      targetPort: 8004
 
 ---
 apiVersion: autoscaling/v2
@@ -114,9 +127,9 @@ spec:
     scaleDown:
       stabilizationWindowSeconds: 60
   metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 70
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
