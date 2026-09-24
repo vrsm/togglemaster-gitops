@@ -59,7 +59,7 @@ spec:
         - name: SERVICE_API_KEY
           valueFrom:
             secretKeyRef:
-              name: togglemaster-secret
+              name: togglemaster-service-api
               key: SERVICE_API_KEY
 
         resources:

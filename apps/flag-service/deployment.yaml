@@ -29,7 +29,7 @@ spec:
         - name: DATABASE_URL
           valueFrom:
             secretKeyRef:
-              name: togglemaster-secret
+              name: togglemaster-db
               key: FLAG_DATABASE_URL
 
         - name: AUTH_SERVICE_URL
@@ -41,7 +41,7 @@ spec:
         - name: MASTER_KEY
           valueFrom:
             secretKeyRef:
-              name: togglemaster-secret
+              name: togglemaster-auth
               key: MASTER_KEY
 
         resources:
