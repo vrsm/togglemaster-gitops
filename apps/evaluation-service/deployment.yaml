@@ -1,0 +1,122 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: evaluation-service
+  namespace: togglemaster
+spec:
+  replicas: 1
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: evaluation-service
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: evaluation-service
+    spec:
+      containers:
+      - name: evaluation-service
+        image: 523694734848.dkr.ecr.us-east-1.amazonaws.com/evaluation-service:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8004
+        env:
+        - name: PORT
+          value: "8004"
+
+        - name: REDIS_URL
+          valueFrom:
+            configMapKeyRef:
+              name: togglemaster-config
+              key: REDIS_URL
+
+        - name: AWS_REGION
+          valueFrom:
+            configMapKeyRef:
+              name: togglemaster-config
+              key: AWS_REGION
+
+        - name: AWS_SQS_URL
+          valueFrom:
+            configMapKeyRef:
+              name: togglemaster-config
+              key: AWS_SQS_URL
+
+        - name: FLAG_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: togglemaster-config
+              key: FLAG_SERVICE_URL
+
+        - name: TARGETING_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: togglemaster-config
+              key: TARGETING_SERVICE_URL
+
+        - name: SERVICE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: togglemaster-secret
+              key: SERVICE_API_KEY
+
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8004
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8004
+          initialDelaySeconds: 30
+          periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: evaluation-service
+  namespace: togglemaster
+spec:
+  type: ClusterIP
+  selector:
+    app: evaluation-service
+  ports:
+  - port: 8004
+    targetPort: 8004
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: evaluation-service
+  namespace: togglemaster
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: evaluation-service
+  minReplicas: 1
+  maxReplicas: 2
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 0
+    scaleDown:
+      stabilizationWindowSeconds: 60
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70

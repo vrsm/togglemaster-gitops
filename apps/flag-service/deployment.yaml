@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flag-service
+  namespace: togglemaster
+spec:
+  replicas: 1
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: flag-service
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: flag-service
+    spec:
+      containers:
+      - name: flag-service
+        image: 523694734848.dkr.ecr.us-east-1.amazonaws.com/flag-service:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8002
+        env:
+        - name: PORT
+          value: "8002"
+
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: togglemaster-secret
+              key: FLAG_DATABASE_URL
+
+        - name: AUTH_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: togglemaster-config
+              key: AUTH_SERVICE_URL
+
+        - name: MASTER_KEY
+          valueFrom:
+            secretKeyRef:
+              name: togglemaster-secret
+              key: MASTER_KEY
+
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8002
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8002
+          initialDelaySeconds: 30
+          periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flag-service
+  namespace: togglemaster
+spec:
+  type: ClusterIP
+  selector:
+    app: flag-service
+  ports:
+  - port: 8002
+    targetPort: 8002
