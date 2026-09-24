@@ -9,3 +9,4 @@ resources:
 - apps/evaluation-service/deployment.yaml
 - apps/analytics-service/deployment.yaml
 - ingress.yaml
+- evaluation-ingress.yaml

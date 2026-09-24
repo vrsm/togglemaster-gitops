@@ -31,13 +31,6 @@ spec:
             name: targeting-service
             port:
               number: 8003
-      - path: /evaluation(/|$)(.*)
-        pathType: ImplementationSpecific
-        backend:
-          service:
-            name: evaluation-service
-            port:
-              number: 8004
       - path: /analytics(/|$)(.*)
         pathType: ImplementationSpecific
         backend:
