@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: analytics-service
-        image: 523694734848.dkr.ecr.us-east-1.amazonaws.com/analytics-service:latest
+        image: 523694734848.dkr.ecr.us-east-1.amazonaws.com/analytics-service:a843ef51e3e962e9712324cf4bdb6c9a28c64f7b
         imagePullPolicy: Always
         ports:
         - containerPort: 8005
