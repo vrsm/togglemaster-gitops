@@ -1,17 +1,3 @@
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: togglemaster
-  namespace: argocd
-spec:
-  project: default
-  source:
-    repoURL: https://github.com/vrsm/togglemaster-gitops.git
-    targetRevision: main
-    path: .
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: togglemaster
   syncPolicy:
     automated:
       prune: true
@@ -19,3 +5,4 @@ spec:
     syncOptions:
     - CreateNamespace=true
     - ServerSideApply=true
+    - ClientSideApplyMigration=false
