@@ -19,5 +19,5 @@ helmCharts:
   version: 91.9.0
   releaseName: prometheus
   namespace: observability
-  includeCRDs: true
+  includeCRDs: false
   valuesFile: observability/prometheus/values.yaml
