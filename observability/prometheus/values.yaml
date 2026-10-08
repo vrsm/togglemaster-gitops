@@ -19,6 +19,14 @@ grafana:
       cpu: 250m
       memory: 256Mi
 
+  additionalDataSources:
+    - name: Loki
+      type: loki
+      access: proxy
+      url: http://loki-gateway.observability.svc.cluster.local:80
+      isDefault: false
+      editable: false
+
 alertmanager:
   enabled: false
 

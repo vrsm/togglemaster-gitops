@@ -21,3 +21,19 @@ helmCharts:
   namespace: observability
   includeCRDs: false
   valuesFile: observability/prometheus/values.yaml
+
+- name: loki
+  repo: https://grafana-community.github.io/helm-charts
+  version: 18.14.0
+  releaseName: loki
+  namespace: observability
+  includeCRDs: false
+  valuesFile: observability/loki/values.yaml
+
+- name: alloy
+  repo: https://grafana.github.io/helm-charts
+  version: 1.13.0
+  releaseName: alloy
+  namespace: observability
+  includeCRDs: false
+  valuesFile: observability/alloy/values.yaml
