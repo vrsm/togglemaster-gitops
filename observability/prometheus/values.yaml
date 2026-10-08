@@ -1,15 +1,36 @@
 grafana:
-  enabled: false
+  enabled: true
+
+  adminUser: admin
+  adminPassword: admin
+
+  service:
+    type: ClusterIP
+    port: 80
+
+  persistence:
+    enabled: false
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi
 
 alertmanager:
   enabled: false
 
 prometheus:
   enabled: true
+
   prometheusSpec:
     retention: 7d
+
     serviceMonitorSelectorNilUsesHelmValues: false
     podMonitorSelectorNilUsesHelmValues: false
+
     resources:
       requests:
         cpu: 100m
