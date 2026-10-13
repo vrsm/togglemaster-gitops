@@ -1,4 +1,3 @@
-```yaml
 deploymentMode: Monolithic
 
 loki:
@@ -98,4 +97,3 @@ resultsCache:
 
 test:
   enabled: false
-```
