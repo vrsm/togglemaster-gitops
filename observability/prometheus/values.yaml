@@ -19,6 +19,13 @@ grafana:
       cpu: 250m
       memory: 256Mi
 
+  sidecar:
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
+      labelValue: "1"
+      searchNamespace: ALL
+
   additionalDataSources:
     - name: Loki
       type: loki
@@ -32,13 +39,10 @@ alertmanager:
 
 prometheus:
   enabled: true
-
   prometheusSpec:
     retention: 7d
-
     serviceMonitorSelectorNilUsesHelmValues: false
     podMonitorSelectorNilUsesHelmValues: false
-
     resources:
       requests:
         cpu: 100m
@@ -47,6 +51,5 @@ prometheus:
         cpu: 500m
         memory: 512Mi
 
-# Desativado para liberar slots de pods nos nós do cluster.
 nodeExporter:
   enabled: false

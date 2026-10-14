@@ -2,38 +2,48 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-- namespace.yaml
-- observability/namespace.yaml
-- configmap.yaml
-- apps/auth-service/deployment.yaml
-- apps/flag-service/deployment.yaml
-- apps/targeting-service/deployment.yaml
-- apps/evaluation-service/deployment.yaml
-- apps/analytics-service/deployment.yaml
-- ingress.yaml
-- evaluation-ingress.yaml
+  - namespace.yaml
+  - observability/namespace.yaml
+  - configmap.yaml
+  - apps/auth-service/deployment.yaml
+  - apps/flag-service/deployment.yaml
+  - apps/targeting-service/deployment.yaml
+  - apps/evaluation-service/deployment.yaml
+  - apps/analytics-service/deployment.yaml
+  - ingress.yaml
+  - evaluation-ingress.yaml
+
+configMapGenerator:
+  - name: togglemaster-grafana-dashboard
+    namespace: observability
+    files:
+      - togglemaster.json=observability/grafana/dashboards/togglemaster.json
+    options:
+      labels:
+        grafana_dashboard: "1"
+      disableNameSuffixHash: false
 
 helmCharts:
-- name: kube-prometheus-stack
-  repo: https://prometheus-community.github.io/helm-charts
-  version: 91.9.0
-  releaseName: prometheus
-  namespace: observability
-  includeCRDs: false
-  valuesFile: observability/prometheus/values.yaml
+  - name: kube-prometheus-stack
+    repo: https://prometheus-community.github.io/helm-charts
+    version: 91.9.0
+    releaseName: prometheus
+    namespace: observability
+    includeCRDs: false
+    valuesFile: observability/prometheus/values.yaml
 
-- name: loki
-  repo: https://grafana-community.github.io/helm-charts
-  version: 18.14.0
-  releaseName: loki
-  namespace: observability
-  includeCRDs: false
-  valuesFile: observability/loki/values.yaml
+  - name: loki
+    repo: https://grafana-community.github.io/helm-charts
+    version: 18.14.0
+    releaseName: loki
+    namespace: observability
+    includeCRDs: false
+    valuesFile: observability/loki/values.yaml
 
-- name: alloy
-  repo: https://grafana.github.io/helm-charts
-  version: 1.13.0
-  releaseName: alloy
-  namespace: observability
-  includeCRDs: false
-  valuesFile: observability/alloy/values.yaml
+  - name: alloy
+    repo: https://grafana.github.io/helm-charts
+    version: 1.13.0
+    releaseName: alloy
+    namespace: observability
+    includeCRDs: false
+    valuesFile: observability/alloy/values.yaml
