@@ -46,3 +46,7 @@ prometheus:
       limits:
         cpu: 500m
         memory: 512Mi
+
+# Desativado para liberar slots de pods nos nós do cluster.
+nodeExporter:
+  enabled: false
