@@ -9,6 +9,7 @@ resources:
   - apps/flag-service/deployment.yaml
   - apps/targeting-service/deployment.yaml
   - apps/evaluation-service/deployment.yaml
+  - apps/evaluation-service/servicemonitor.yaml
   - apps/analytics-service/deployment.yaml
   - ingress.yaml
   - evaluation-ingress.yaml
