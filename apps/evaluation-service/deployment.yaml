@@ -19,7 +19,7 @@ spec:
       serviceAccountName: evaluation-service
       containers:
         - name: evaluation-service
-          image: 523694734848.dkr.ecr.us-east-1.amazonaws.com/evaluation-service:metrics-20261015-1
+          image: 523694734848.dkr.ecr.us-east-1.amazonaws.com/evaluation-service:3f06d9e7477a0417a7cd7e13aca1b00252f59146
           imagePullPolicy: Always
           ports:
             - name: http
