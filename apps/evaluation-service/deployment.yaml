@@ -29,6 +29,15 @@ spec:
             - name: PORT
               value: "8004"
 
+            - name: OTEL_SERVICE_NAME
+              value: evaluation-service
+
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://togglemaster-otel-collector.observability.svc.cluster.local:4318
+
+            - name: OTEL_DEPLOYMENT_ENVIRONMENT
+              value: production
+
             - name: REDIS_HOST
               valueFrom:
                 configMapKeyRef:
