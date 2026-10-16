@@ -13,6 +13,7 @@ resources:
   - apps/analytics-service/deployment.yaml
   - ingress.yaml
   - evaluation-ingress.yaml
+  - observability/otel-collector
 
 configMapGenerator:
   - name: togglemaster-grafana-dashboard
