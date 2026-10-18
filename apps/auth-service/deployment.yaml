@@ -64,6 +64,8 @@ kind: Service
 metadata:
   name: auth-service
   namespace: togglemaster
+  labels:
+    app: auth-service
 spec:
   type: ClusterIP
   selector:
