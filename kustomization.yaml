@@ -15,6 +15,7 @@ resources:
   - ingress.yaml
   - evaluation-ingress.yaml
   - observability/otel-collector
+  - observability/prometheus/auth-service-alerts.yaml
 
 configMapGenerator:
   - name: togglemaster-grafana-dashboard
