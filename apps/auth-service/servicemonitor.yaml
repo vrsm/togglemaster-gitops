@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: auth-service
+  namespace: togglemaster
+  labels:
+    app: auth-service
+spec:
+  namespaceSelector:
+    matchNames:
+      - togglemaster
+  selector:
+    matchLabels:
+      app: auth-service
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 30s
