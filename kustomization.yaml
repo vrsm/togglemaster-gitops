@@ -6,6 +6,7 @@ resources:
   - observability/namespace.yaml
   - configmap.yaml
   - apps/auth-service/deployment.yaml
+  - apps/auth-service/servicemonitor.yaml
   - apps/flag-service/deployment.yaml
   - apps/targeting-service/deployment.yaml
   - apps/evaluation-service/deployment.yaml
