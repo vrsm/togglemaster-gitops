@@ -35,7 +35,7 @@ grafana:
       editable: false
 
 alertmanager:
-  enabled: false
+  enabled: true
 
 prometheus:
   enabled: true
