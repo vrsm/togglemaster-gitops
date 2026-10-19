@@ -1,0 +1,33 @@
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: AlertmanagerConfig
+metadata:
+  name: togglemaster-discord
+  namespace: observability
+  labels:
+    app.kubernetes.io/part-of: togglemaster
+spec:
+  route:
+    receiver: togglemaster-discord
+    groupBy:
+      - alertname
+      - service
+    groupWait: 10s
+    groupInterval: 5m
+    repeatInterval: 4h
+    matchers:
+      - name: alertname
+        value: AuthServiceHighHTTP5xxRate
+        matchType: "="
+  receivers:
+    - name: togglemaster-discord
+      discordConfigs:
+        - apiURL:
+            name: alertmanager-discord-webhook
+            key: url
+          sendResolved: true
+          title: '{{ .CommonLabels.alertname }}'
+          message: >-
+            {{ range .Alerts }}Serviço: {{ .Labels.service }}.
+            Severidade: {{ .Labels.severity }}.
+            Resumo: {{ .Annotations.summary }}
+            {{ end }}
