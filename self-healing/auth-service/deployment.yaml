@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-self-healer
+  namespace: observability
+  labels:
+    app.kubernetes.io/name: auth-self-healer
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: auth-self-healer
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: auth-self-healer
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: receiver
+          image: python:3.12-alpine
+          imagePullPolicy: IfNotPresent
+          command: ["python3", "-u", "/app/receiver.py"]
+          ports:
+            - name: webhook
+              containerPort: 9099
+          env:
+            - name: WEBHOOK_TOKEN_FILE
+              value: /var/run/webhook/token
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: webhook
+            initialDelaySeconds: 2
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: webhook
+            initialDelaySeconds: 5
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 10m
+              memory: 24Mi
+            limits:
+              cpu: 50m
+              memory: 64Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: receiver-code
+              mountPath: /app
+              readOnly: true
+            - name: webhook-token
+              mountPath: /var/run/webhook
+              readOnly: true
+      volumes:
+        - name: receiver-code
+          configMap:
+            name: auth-self-healer-code
+        - name: webhook-token
+          secret:
+            secretName: auth-self-healer-webhook
+            items:
+              - key: token
+                path: token
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-self-healer
+  namespace: observability
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: auth-self-healer
+  ports:
+    - name: webhook
+      port: 9099
+      targetPort: webhook

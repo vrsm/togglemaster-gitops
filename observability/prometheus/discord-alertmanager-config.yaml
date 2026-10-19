@@ -31,3 +31,12 @@ spec:
             Severidade: {{ .Labels.severity }}.
             Resumo: {{ .Annotations.summary }}
             {{ end }}
+      webhookConfigs:
+        - url: http://auth-self-healer.observability.svc.cluster.local:9099/webhook
+          sendResolved: true
+          maxAlerts: 20
+          timeout: 5s
+          httpConfig:
+            bearerTokenSecret:
+              name: auth-self-healer-webhook-client
+              key: token
