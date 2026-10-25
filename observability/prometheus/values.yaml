@@ -14,10 +14,27 @@ grafana:
   resources:
     requests:
       cpu: 50m
-      memory: 128Mi
+      memory: 256Mi
     limits:
       cpu: 250m
-      memory: 256Mi
+      memory: 384Mi
+
+  readinessProbe:
+    httpGet:
+      path: /api/health
+      port: grafana
+    timeoutSeconds: 5
+    periodSeconds: 10
+    failureThreshold: 3
+
+  livenessProbe:
+    httpGet:
+      path: /api/health
+      port: grafana
+    initialDelaySeconds: 60
+    timeoutSeconds: 30
+    periodSeconds: 10
+    failureThreshold: 10
 
   sidecar:
     dashboards:
@@ -33,7 +50,6 @@ grafana:
       url: http://loki-gateway.observability.svc.cluster.local:80
       isDefault: false
       editable: false
-
 alertmanager:
   enabled: true
   alertmanagerSpec:
