@@ -18,9 +18,9 @@ spec:
       port: 4318
       targetPort: otlp-http
       protocol: TCP
-    - name: internal-metrics
+    - name: int-metrics
       port: 8888
-      targetPort: internal-metrics
+      targetPort: int-metrics
       protocol: TCP
     - name: metrics
       port: 8889

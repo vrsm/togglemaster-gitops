@@ -27,7 +27,7 @@ spec:
             - name: otlp-http
               containerPort: 4318
               protocol: TCP
-            - name: internal-metrics
+            - name: int-metrics
               containerPort: 8888
               protocol: TCP
             - name: metrics
