@@ -18,6 +18,24 @@ spec:
       - name: alertname
         value: AuthServiceHighHTTP5xxRate
         matchType: "="
+    routes:
+      - receiver: togglemaster-discord
+        matchers:
+          - name: alertname
+            value: AuthServiceHighHTTP5xxRate
+            matchType: "="
+        continue: true
+      - receiver: auth-self-healer
+        matchers:
+          - name: alertname
+            value: AuthServiceHighHTTP5xxRate
+            matchType: "="
+          - name: service
+            value: auth-service
+            matchType: "="
+          - name: severity
+            value: critical
+            matchType: "="
   receivers:
     - name: togglemaster-discord
       discordConfigs:
@@ -31,3 +49,11 @@ spec:
             Severidade: {{ .Labels.severity }}.
             Resumo: {{ .Annotations.summary }}
             {{ end }}
+    - name: auth-self-healer
+      webhookConfigs:
+        - url: http://auth-self-healer.observability.svc.cluster.local:9099/webhook
+          sendResolved: false
+          httpConfig:
+            bearerTokenSecret:
+              name: auth-self-healer-webhook
+              key: token
