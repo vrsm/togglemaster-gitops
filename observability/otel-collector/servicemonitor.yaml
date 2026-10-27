@@ -13,6 +13,6 @@ spec:
     matchLabels:
       app.kubernetes.io/name: togglemaster-otel-collector
   endpoints:
-    - port: metrics
+    - port: internal-metrics
       path: /metrics
       interval: 30s

@@ -23,12 +23,19 @@ spec:
           ports:
             - name: otlp-grpc
               containerPort: 4317
+              protocol: TCP
             - name: otlp-http
               containerPort: 4318
+              protocol: TCP
+            - name: internal-metrics
+              containerPort: 8888
+              protocol: TCP
             - name: metrics
               containerPort: 8889
+              protocol: TCP
             - name: health
               containerPort: 13133
+              protocol: TCP
           env:
             - name: NEW_RELIC_LICENSE_KEY
               valueFrom:
