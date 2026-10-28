@@ -9,10 +9,13 @@ resources:
   - apps/auth-service/deployment.yaml
   - apps/auth-service/servicemonitor.yaml
   - apps/flag-service/deployment.yaml
+  - apps/flag-service/servicemonitor.yaml
   - apps/targeting-service/deployment.yaml
+  - apps/targeting-service/servicemonitor.yaml
   - apps/evaluation-service/deployment.yaml
   - apps/evaluation-service/servicemonitor.yaml
   - apps/analytics-service/deployment.yaml
+  - apps/analytics-service/servicemonitor.yaml
   - ingress.yaml
   - evaluation-ingress.yaml
   - observability/otel-collector

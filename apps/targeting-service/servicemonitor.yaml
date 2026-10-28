@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: targeting-service
+  namespace: togglemaster
+  labels:
+    app: targeting-service
+spec:
+  namespaceSelector:
+    matchNames:
+      - togglemaster
+  selector:
+    matchLabels:
+      app: targeting-service
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 30s
