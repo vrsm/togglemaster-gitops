@@ -12,7 +12,7 @@ spec:
         - alert: AuthServiceHighHTTP5xxRate
           expr: |
             (
-              sum(rate(http_requests_total{job="auth-service",status=~"5.."}[5m]))
+              sum(rate(http_requests_total{job="auth-service",status=~"[45].."}[5m]))
               /
               clamp_min(sum(rate(http_requests_total{job="auth-service"}[5m])), 1e-9)
             ) > 0.05
@@ -23,5 +23,5 @@ spec:
             severity: critical
             service: auth-service
           annotations:
-            summary: "Taxa de HTTP 5xx acima de 5% no auth-service"
-            description: "Mais de 5% das requisições do auth-service retornaram HTTP 5xx nos últimos 5 minutos por pelo menos 2 minutos."
+            summary: "Taxa de HTTP 4xx/5xx acima de 5% no auth-service"
+            description: "Mais de 5% das requisições do auth-service retornaram HTTP 4xx/5xx nos últimos 5 minutos por pelo menos 2 minutos."
