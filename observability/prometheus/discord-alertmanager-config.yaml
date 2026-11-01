@@ -5,26 +5,27 @@ metadata:
   namespace: observability
   labels:
     app.kubernetes.io/part-of: togglemaster
+
 spec:
   route:
     receiver: togglemaster-discord
     groupBy:
       - alertname
       - service
-    groupWait: 10s
-    groupInterval: 5m
-    repeatInterval: 4h
-    matchers:
-      - name: alertname
-        value: AuthServiceHighHTTP5xxRate
-        matchType: "="
+    groupWait: 1s
+    groupInterval: 1m
+    repeatInterval: 1m
     routes:
+      # Mantém a notificação Discord para o alerta de autenticação
+      # e permite que o mesmo alerta também chegue ao Self-Healer.
       - receiver: togglemaster-discord
         matchers:
           - name: alertname
             value: AuthServiceHighHTTP5xxRate
             matchType: "="
         continue: true
+
+      # Self-Healer recebe somente o alerta crítico de autenticação.
       - receiver: auth-self-healer
         matchers:
           - name: alertname
@@ -36,6 +37,7 @@ spec:
           - name: severity
             value: critical
             matchType: "="
+
   receivers:
     - name: togglemaster-discord
       discordConfigs:
@@ -45,10 +47,14 @@ spec:
           sendResolved: true
           title: '{{ .CommonLabels.alertname }}'
           message: >-
-            {{ range .Alerts }}Serviço: {{ .Labels.service }}.
+            {{ range .Alerts }}
+            Serviço: {{ .Labels.service }}.
+            Namespace: {{ .Labels.namespace }}.
             Severidade: {{ .Labels.severity }}.
-            Resumo: {{ .Annotations.summary }}
+            Resumo: {{ .Annotations.summary }}.
+            Descrição: {{ .Annotations.description }}
             {{ end }}
+
     - name: auth-self-healer
       webhookConfigs:
         - url: http://auth-self-healer.observability.svc.cluster.local:9099/webhook
