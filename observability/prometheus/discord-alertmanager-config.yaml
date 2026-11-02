@@ -9,15 +9,19 @@ metadata:
 spec:
   route:
     receiver: togglemaster-discord
+    matchers:
+      - name: namespace
+        value: togglemaster
+        matchType: "="
     groupBy:
       - alertname
       - service
-    groupWait: 1s
-    groupInterval: 1m
-    repeatInterval: 1m
+      - namespace
+    groupWait: 30s
+    groupInterval: 5m
+    repeatInterval: 4h
     routes:
-      # Mantém a notificação Discord para o alerta de autenticação
-      # e permite que o mesmo alerta também chegue ao Self-Healer.
+      # Envia o alerta de autenticacao ao Discord.
       - receiver: togglemaster-discord
         matchers:
           - name: alertname
@@ -25,7 +29,8 @@ spec:
             matchType: "="
         continue: true
 
-      # Self-Healer recebe somente o alerta crítico de autenticação.
+      # Encaminha somente alertas criticos do auth-service
+      # ao Self-Healer.
       - receiver: auth-self-healer
         matchers:
           - name: alertname
