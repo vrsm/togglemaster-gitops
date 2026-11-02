@@ -15,7 +15,8 @@ spec:
       labels:
         app.kubernetes.io/name: auth-self-healer
     spec:
-      automountServiceAccountToken: false
+      serviceAccountName: auth-self-healer
+      automountServiceAccountToken: true
       securityContext:
         runAsNonRoot: true
         runAsUser: 10001
@@ -26,13 +27,21 @@ spec:
         - name: receiver
           image: python:3.12-alpine
           imagePullPolicy: IfNotPresent
-          command: ["python3", "-u", "/app/receiver.py"]
+          command:
+            - python3
+            - -u
+            - /app/receiver.py
           ports:
             - name: webhook
               containerPort: 9099
+              protocol: TCP
           env:
             - name: WEBHOOK_TOKEN_FILE
               value: /var/run/webhook/token
+            - name: SELF_HEALER_MODE
+              value: DRY_RUN
+            - name: SELF_HEALER_COOLDOWN_SECONDS
+              value: "600"
           readinessProbe:
             httpGet:
               path: /health
@@ -56,7 +65,8 @@ spec:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
             capabilities:
-              drop: ["ALL"]
+              drop:
+                - ALL
           volumeMounts:
             - name: receiver-code
               mountPath: /app
@@ -88,3 +98,4 @@ spec:
     - name: webhook
       port: 9099
       targetPort: webhook
+      protocol: TCP

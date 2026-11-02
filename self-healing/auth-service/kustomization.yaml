@@ -1,11 +1,15 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: observability
+
 resources:
   - deployment.yaml
+  - rbac.yaml
+
 configMapGenerator:
   - name: auth-self-healer-code
+    namespace: observability
     files:
       - receiver.py
+
 generatorOptions:
   disableNameSuffixHash: true
