@@ -50,15 +50,21 @@ grafana:
       url: http://loki-gateway.observability.svc.cluster.local:80
       isDefault: false
       editable: false
+
 alertmanager:
   enabled: true
   alertmanagerSpec:
+    alertmanagerConfigMatcherStrategy:
+      type: None
+
     alertmanagerConfigSelector:
       matchLabels:
         app.kubernetes.io/part-of: togglemaster
+
     alertmanagerConfigNamespaceSelector:
       matchLabels:
         kubernetes.io/metadata.name: observability
+
     resources:
       requests:
         cpu: 25m
