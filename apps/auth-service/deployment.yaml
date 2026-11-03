@@ -4,68 +4,78 @@ metadata:
   name: auth-service
   namespace: togglemaster
 spec:
-  replicas: 1
+  replicas: 2
   revisionHistoryLimit: 5
   selector:
     matchLabels:
       app: auth-service
   strategy:
-    type: Recreate
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
   template:
     metadata:
       labels:
         app: auth-service
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - auth-service
+              topologyKey: kubernetes.io/hostname
       containers:
-      - name: auth-service
-        image: 523694734848.dkr.ecr.us-east-1.amazonaws.com/auth-service:94aae3056e90357d52b9e4dcd892b050b07f8eef
-        imagePullPolicy: Always
-        ports:
-        - name: http
-          containerPort: 8001
-        env:
-        - name: OTEL_SERVICE_NAME
-          value: auth-service
-        - name: OTEL_EXPORTER_OTLP_ENDPOINT
-          value: http://togglemaster-otel-collector.observability.svc.cluster.local:4318
-        - name: OTEL_EXPORTER_OTLP_PROTOCOL
-          value: http/protobuf
-        - name: OTEL_DEPLOYMENT_ENVIRONMENT
-          value: production
-        - name: PORT
-          value: "8001"
-
-        - name: DATABASE_URL
-          valueFrom:
-            secretKeyRef:
-              name: togglemaster-db
-              key: AUTH_DATABASE_URL
-
-        - name: MASTER_KEY
-          valueFrom:
-            secretKeyRef:
-              name: togglemaster-auth
-              key: MASTER_KEY
-
-        resources:
-          requests:
-            cpu: "100m"
-            memory: "128Mi"
-          limits:
-            cpu: "500m"
-            memory: "512Mi"
-        readinessProbe:
-          httpGet:
-            path: /health
-            port: 8001
-          initialDelaySeconds: 10
-          periodSeconds: 5
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 8001
-          initialDelaySeconds: 30
-          periodSeconds: 10
+        - name: auth-service
+          image: 523694734848.dkr.ecr.us-east-1.amazonaws.com/auth-service:94aae3056e90357d52b9e4dcd892b050b07f8eef
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8001
+          env:
+            - name: OTEL_SERVICE_NAME
+              value: auth-service
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://togglemaster-otel-collector.observability.svc.cluster.local:4318
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: http/protobuf
+            - name: OTEL_DEPLOYMENT_ENVIRONMENT
+              value: production
+            - name: PORT
+              value: "8001"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: togglemaster-db
+                  key: AUTH_DATABASE_URL
+            - name: MASTER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: togglemaster-auth
+                  key: MASTER_KEY
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8001
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8001
+            initialDelaySeconds: 30
+            periodSeconds: 10
 ---
 apiVersion: v1
 kind: Service
@@ -79,6 +89,6 @@ spec:
   selector:
     app: auth-service
   ports:
-  - name: http
-    port: 8001
-    targetPort: http
+    - name: http
+      port: 8001
+      targetPort: http
