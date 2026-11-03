@@ -20,6 +20,7 @@ spec:
             sum(rate(http_requests_total{job="auth-service"}[5m])) > 0
           for: 2m
           labels:
+            namespace: togglemaster
             severity: critical
             service: auth-service
           annotations:
