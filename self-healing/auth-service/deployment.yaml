@@ -39,7 +39,7 @@ spec:
             - name: WEBHOOK_TOKEN_FILE
               value: /var/run/webhook/token
             - name: SELF_HEALER_MODE
-              value: DRY_RUN
+              value: ACTIVE
             - name: SELF_HEALER_COOLDOWN_SECONDS
               value: "600"
           readinessProbe:
